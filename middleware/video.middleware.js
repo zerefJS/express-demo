@@ -1,49 +1,21 @@
 import Joi from 'joi'
+import { ApiError } from '../services/error.services.js'
 
-const validateMessage = {
-    'any.required': "{{#label}} is requried",
-    'string.max': "{{#label}} is too long",
-    'string.empty': '{{#label}} is not empty',
-    'string.min': "{{#label}} is too short"
-}
+const fieldSchema = Joi.string().trim().required().min(3).max(255)
+const fieldSchemaOptional = Joi.string().trim().min(3).max(255).optional()
 
 const schema = Joi.object({
-    name: Joi
-        .string()
-        .trim()
-        .required()
-        .min(3)
-        .max(255)
-        .messages(validateMessage),
-
-    url: Joi
-        .string()
-        .trim()
-        .required()
-        .min(3)
-        .max(255)
-        .messages(validateMessage),
-
-    poster: Joi
-        .string()
-        .trim()
-        .required()
-        .min(3)
-        .max(255)
-        .messages(validateMessage),
+    name: fieldSchema,
+    url: fieldSchema,
+    poster: fieldSchema,
+    description: fieldSchemaOptional,
+    category: fieldSchemaOptional,
 })
 
-const videoValidation = async (req, res, next) => {
+export const videoValidation = async (req, res, next) => {
     const { error } = schema.validate(req.body)
     if (error) {
-        return res.status(400).send({
-            success: false,
-            message: error.message
-        })
+        throw new ApiError(error.message, 401)
     }
     next()
-}
-
-export {
-    videoValidation
 }

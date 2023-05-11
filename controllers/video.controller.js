@@ -1,7 +1,6 @@
-import { db } from "../services/db.js"
 import { Video } from "../services/video.services.js"
 
-const getVideo = async (req, res) => {
+const getVideoAll = async (req, res) => {
     const { error, data, errorMessage } = await Video.findMany()
     if (error) {
         return res.status(400).send({
@@ -29,10 +28,7 @@ const createVideo = async (req, res) => {
         success: true,
         data
     })
-
-
 }
-
 
 const getByVideoUrl = async (req, res) => {
     const { error, data, errorMessage } = await Video.findByUrl(req.params)
@@ -47,13 +43,14 @@ const getByVideoUrl = async (req, res) => {
         succes: true,
         data
     })
-
 }
 const updateByVideoUrl = async (req, res) => { }
-const deleteByVideoUrl = async (req, res) => { }
+const deleteByVideoUrl = async (req, res) => { 
+
+}
 
 export default {
-    getVideo,
+    getVideoAll,
     createVideo,
     getByVideoUrl,
     updateByVideoUrl,

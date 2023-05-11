@@ -1,1 +1,0 @@
-export { videoRouter } from "./video/index.js"

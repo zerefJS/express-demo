@@ -1,13 +1,12 @@
 import express from 'express'
-import videoController from '../../controllers/video.controller.js'
-import { videoValidation } from '../../middleware/video.middleware.js'
-
+import videoController from '../controllers/video.controller.js'
+import { videoValidation } from '../middleware/video.middleware.js'
 
 const router = express.Router()
 
 router
     .route('/')
-    .get(videoController.getVideo)
+    .get(videoController.getVideoAll)
     .post(videoValidation, videoController.createVideo)
 
 router
