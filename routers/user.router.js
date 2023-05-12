@@ -1,16 +1,13 @@
 import express from 'express';
 import { User } from '../services/user.services.js';
 import { Auth } from '../services/auth.services.js';
+import passport from 'passport';
 
 const router = express.Router();
 
 router
     .route('/')
     .get(async (req, res) => {
-        // const ip = req.socket.remoteAddress
-        // const userAgent = req.headers['user-agent']
-        // console.log(ip)
-        // console.log(userAgent)
         const data = await User.findMany()
         res.status(200).json({
             success: true,
@@ -25,13 +22,16 @@ router
         })
     })
 
-router.route('/login').post(async (req, res) => {
-    const data = await Auth.login(req.body)
+router
+    .route('/login')
+    .post(
+        passport.authenticate("local", { session: false }),
+        async (req, res) => {
+            const data = await Auth.login(req.body)
+            res.status(200).json(data)
 
-    res.status(200).json({ token: data })
 
-
-})
+        })
 
 router
     .route('/:id')

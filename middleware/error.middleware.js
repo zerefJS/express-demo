@@ -7,8 +7,10 @@ export const errorHandleMiddleware = (err, req, res, next) => {
             message: "> " + err.message
         })
     }
+
+    console.log(err)
     return res.status(500).send({
         success: false,
-        message: err.message
+        message: "Unexpected error. Please try again"
     })
 }

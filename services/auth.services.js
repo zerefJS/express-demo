@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+// import { Strategy as LocalStrategy } from 'passport-local';
 import { User } from './user.services.js';
 import { ApiError } from './error.services.js';
-import { Strategy as JWTStrategy } from 'passport-jwt';
 import { jwtOptions } from '../config/jwt.config.js';
 
 export class Auth {
@@ -12,10 +12,33 @@ export class Auth {
         }
     }
 
-    static strategy() {
-        return new JWTStrategy(jwtOptions, async (jwtPayload, done) => {
+    // static useLocalStrategy() {
+    //     return new LocalStrategy({
+    //         usernameField: 'email',
+    //         passwordField: 'password',
+    //         session: false
+    //     }, async function (email, password, done) {
+    //         try {
+    //             const user = await User.findByEmailOrName({ email })
+    //             if (!user) return done(null, false, { message: 'Incorrect email or password' })
+
+    //             const isPasswordValid = await bcrypt.compare(password, user.password)
+    //             if (!isPasswordValid) return done(null, false, { message: 'Incorrect email or password' })
+
+    //             return done(null, user)
+
+    //         } catch (error) {
+    //             return done(error, false)
+    //         }
+    //     }
+    //     )
+    // }
+
+
+    static useJwtStrategy(jwtStrategy) {
+        return new jwtStrategy(jwtOptions, async (jwtPayload, done) => {
             try {
-                const user = await User.findById(jwtPayload.sub);
+                const user = await User.findById(jwtPayload.id);
                 if (!user) {
                     return done(null, false);
                 }
@@ -44,9 +67,9 @@ export class Auth {
 
         const { id, name } = data;
 
-        const token = Auth.#generateToken({ sub: id, name });
+        const token = Auth.#generateToken({ id, name, email });
 
-        return { token, user: { id, name } };
+        return { token, user: { id, name, email } };
     }
 }
 

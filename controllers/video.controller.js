@@ -1,14 +1,7 @@
 import { Video } from "../services/video.services.js"
 
 const getVideoAll = async (req, res) => {
-    const { error, data, errorMessage } = await Video.findMany()
-    if (error) {
-        return res.status(400).send({
-            success: false,
-            message: errorMessage
-        })
-    }
-
+    const data = await Video.findMany()
     return res.status(200).send({
         success: true,
         data
@@ -16,14 +9,7 @@ const getVideoAll = async (req, res) => {
 }
 
 const createVideo = async (req, res) => {
-    const { error, data, errorMessage } = await Video.create(req.body)
-    if (error) {
-        return res.status(400).send({
-            success: false,
-            message: errorMessage
-        })
-    }
-
+    const data = await Video.create(req.body)
     return res.status(200).send({
         success: true,
         data
@@ -31,14 +17,7 @@ const createVideo = async (req, res) => {
 }
 
 const getByVideoUrl = async (req, res) => {
-    const { error, data, errorMessage } = await Video.findByUrl(req.params)
-    if (error) {
-        return res.status(400).send({
-            success: false,
-            message: errorMessage
-        })
-    }
-
+    const data = await Video.findByUrl(req.params)
     return res.status(200).send({
         succes: true,
         data
