@@ -2,6 +2,7 @@ import { Video } from "../services/video.services.js"
 
 const getVideoAll = async (req, res) => {
     const data = await Video.findMany()
+
     return res.status(200).send({
         success: true,
         data
@@ -24,7 +25,7 @@ const getByVideoUrl = async (req, res) => {
     })
 }
 const updateByVideoUrl = async (req, res) => { }
-const deleteByVideoUrl = async (req, res) => { 
+const deleteByVideoUrl = async (req, res) => {
 
 }
 

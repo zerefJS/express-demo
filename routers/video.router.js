@@ -7,7 +7,7 @@ const router = express.Router()
 router
     .route('/')
     .get(videoController.getVideoAll)
-    .post(videoValidation, videoController.createVideo)
+    .post(videoController.createVideo)
 
 router
     .route('/:url')

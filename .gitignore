@@ -1,2 +1,4 @@
 .env
 node_modules
+bun.lockb
+pnpm-lock.yaml

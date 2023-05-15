@@ -11,6 +11,6 @@ export const errorHandleMiddleware = (err, req, res, next) => {
     console.log(err)
     return res.status(500).send({
         success: false,
-        message: "Unexpected error. Please try again"
+        message: "Unexpected error. Please try again",
     })
 }
