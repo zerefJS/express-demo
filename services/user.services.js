@@ -1,64 +1,73 @@
-
-import bcrypt from "bcryptjs"
-import { executeInsertQuery, query, queryWithParams } from "../utils/query.js"
-import { ApiError } from "./error.services.js"
+import bcrypt from 'bcryptjs'
+import { executeQuery, query, queryWithParams } from '../utils/database.js'
+import { ApiError } from './error.services.js'
 
 export class User {
-    // dev mode function
-    static async findMany() {
-        return await query(
-            /*sql*/`SELECT * FROM users LIMIT 50
-        `)
-    }
+   #name
+   #email
+   #password
+   #avatar
+   #ip
+   #userAgent
 
-    static async create({ name, email, password, avatar, ip, userAgent }) {
+   constructor({ name, email, password, avatar, ip, userAgent }) {
+      this.#name = name
+      this.#email = email
+      this.#password = password
+      this.#avatar = avatar
+      this.#ip = ip
+      this.#userAgent = userAgent
+   }
 
-        const isExistUser = await User.findByEmailAndName({ email, name })
-        if (isExistUser?.length) throw new ApiError('Username or email already exist', 401)
+   async save() {
+      try {
+         await this.#hashPassword()
+         const data = await executeQuery(
+            `
+         INSERT INTO users (name, email, password, ip, user_agent, avatar) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+            [this.#name, this.#email, this.#password, this.#ip, this.#userAgent, this.#avatar]
+         )
 
-        const hashPassword = await bcrypt.hash(password, 10);
+         if (!data.affectedRows) throw new ApiError('Create user failed')
+      } catch (err) {
+         throw err
+      }
+   }
 
-        const data = await executeInsertQuery(
-            /*sql*/`INSERT INTO users (name, email, password, ip, user_agent, avatar) VALUES (?, ?, ?, ?, ?, ?)`
-            ,
-            [name, email, hashPassword, ip, userAgent, avatar]
-        )
+   async #hashPassword() {
+      this.#password = await bcrypt.hash(this.#password, 10)
+   }
 
-        if(!data) throw new ApiError("Create user failed", 500)
+   static async isAdmin({ email }) {
+      try {
+         const [isAdmin] = await queryWithParams(`SELECT * FROM users WHERE email = ? LIMIT 1`, [
+            email,
+         ])
 
-        return await queryWithParams(
-            /*sql*/`SELECT * FROM users WHERE id = ? LIMIT 1`
-            ,
-            [data.insertId]
-        )
-    }
+         return isAdmin ? isAdmin.role === 'admin' : false
+      } catch {
+         return false
+      }
+   }
 
-    static async findByEmailAndName({ email, name }) {
-        return await queryWithParams(
-            /*sql*/`SELECT * FROM users WHERE email = ? AND name = ? LIMIT 1`
-            ,
-            [email, name]
-        )
+   // dev mode function
+   static async findMany() {
+      return await query(`SELECT * FROM users LIMIT 50`)
+   }
 
-    }
+   static async findByEmailAndName({ email, name }) {
+      return await queryWithParams(`SELECT * FROM users WHERE email = ? AND name = ? LIMIT 1`, [
+         email,
+         name,
+      ])
+   }
 
-    static async findByEmail({ email }) {
-        return await queryWithParams(
-            /*sql*/`SELECT * FROM users WHERE email = ? LIMIT 1`
-            ,
-            [email]
-        )
-    }
+   static async findByEmail({ email }) {
+      return await queryWithParams(`SELECT * FROM users WHERE email = ? LIMIT 1`, [email])
+   }
 
-
-    static async findById(id) {
-        const userId = parseInt(id)
-        if (typeof userId !== 'number') return null
-
-        return await queryWithParams(
-            /*sql*/`SELECT * FROM users WHERE id = ? LIMIT 1`
-            ,
-            [id]
-        )
-    }
+   static async findByName({ name }) {
+      return await queryWithParams(`SELECT * FROM users WHERE id = name LIMIT 1`, [name])
+   }
 }
